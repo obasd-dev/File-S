@@ -1,428 +1,405 @@
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TeleNative - Lossless Web Messenger</title>
-  <style>
-    :root {
-      --bg-dark: #0f172a;
-      --sidebar-bg: #1e293b;
-      --chat-bg: #0f172a;
-      --panel-bg: #1e293b;
-      --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --msg-out: #0369a1;
-      --msg-in: #334155;
-      --border-color: #334155;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vertex Messenger</title>
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    }
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,Arial,sans-serif;
+}
 
-    body {
-      background-color: var(--bg-dark);
-      color: var(--text-main);
-      height: 100vh;
-      display: flex;
-      overflow: hidden;
-    }
+body{
+height:100vh;
+display:flex;
+background:#17212b;
+overflow:hidden;
+}
 
-    /* Sidebar Layout */
-    .sidebar {
-      width: 320px;
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border-color);
-      display: flex;
-      flex-direction: column;
-    }
+/* Sidebar */
 
-    .sidebar-header {
-      padding: 16px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      border-bottom: 1px solid var(--border-color);
-      color: var(--accent);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+.sidebar{
+width:320px;
+background:#202c33;
+display:flex;
+flex-direction:column;
+border-right:1px solid rgba(255,255,255,.08);
+}
 
-    .chat-list {
-      flex: 1;
-      overflow-y: auto;
-    }
+.logo{
+padding:20px;
+font-size:24px;
+font-weight:bold;
+color:white;
+background:#293742;
+}
 
-    .chat-item {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.03);
-      transition: background 0.2s;
-    }
+.search{
+padding:15px;
+}
 
-    .chat-item:hover, .chat-item.active {
-      background: rgba(56, 189, 248, 0.1);
-    }
+.search input{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+background:#36454f;
+color:white;
+outline:none;
+}
 
-    .avatar {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background: var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      color: #000;
-    }
+.chat-list{
+flex:1;
+overflow:auto;
+}
 
-    .chat-info {
-      flex: 1;
-      overflow: hidden;
-    }
+.chat{
+display:flex;
+gap:12px;
+padding:15px;
+cursor:pointer;
+transition:.3s;
+}
 
-    .chat-name {
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
+.chat:hover{
+background:#2d3b45;
+}
 
-    .chat-preview {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.avatar{
+width:50px;
+height:50px;
+border-radius:50%;
+background:#4da6ff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:22px;
+color:white;
+}
 
-    /* Main Chat View */
-    .chat-area {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: var(--chat-bg);
-    }
+.chat-info h4{
+color:white;
+}
 
-    .chat-header {
-      padding: 16px 24px;
-      background: var(--panel-bg);
-      border-bottom: 1px solid var(--border-color);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.chat-info p{
+color:#9fb3c8;
+font-size:14px;
+}
 
-    .messages-container {
-      flex: 1;
-      padding: 24px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
+/* Chat */
 
-    .message {
-      max-width: 65%;
-      padding: 10px 14px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.4;
-      position: relative;
-      word-break: break-word;
-    }
+.main{
+flex:1;
+display:flex;
+flex-direction:column;
+background:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80');
+background-size:cover;
+}
 
-    .message.outgoing {
-      align-self: flex-end;
-      background: var(--msg-out);
-      border-bottom-right-radius: 2px;
-    }
+.header{
+height:70px;
+background:#293742;
+display:flex;
+align-items:center;
+padding:20px;
+color:white;
+gap:15px;
+backdrop-filter:blur(8px);
+}
 
-    .message.incoming {
-      align-self: flex-start;
-      background: var(--msg-in);
-      border-bottom-left-radius: 2px;
-    }
+.messages{
+flex:1;
+padding:20px;
+overflow:auto;
+display:flex;
+flex-direction:column;
+gap:12px;
+}
 
-    .message-meta {
-      font-size: 0.7rem;
-      color: rgba(255, 255, 255, 0.6);
-      margin-top: 4px;
-      text-align: right;
-    }
+.msg{
+max-width:70%;
+padding:12px 15px;
+border-radius:18px;
+white-space:pre-wrap;
+animation:pop .25s ease;
+word-wrap:break-word;
+}
 
-    /* Media & Attachment Styles */
-    .media-card {
-      margin-top: 6px;
-      border-radius: 8px;
-      overflow: hidden;
-      background: rgba(0,0,0,0.2);
-    }
+.sent{
+align-self:flex-end;
+background:#4da6ff;
+color:white;
+border-bottom-right-radius:6px;
+}
 
-    .media-card img {
-      max-width: 100%;
-      max-height: 350px;
-      display: block;
-      object-fit: contain;
-      cursor: pointer;
-    }
+.received{
+align-self:flex-start;
+background:#2d3b45;
+color:white;
+border-bottom-left-radius:6px;
+}
 
-    .media-badge {
-      display: inline-block;
-      padding: 2px 6px;
-      background: rgba(0,0,0,0.5);
-      font-size: 0.75rem;
-      border-radius: 4px;
-      margin-top: 4px;
-      color: #38bdf8;
-    }
+.msg img{
+width:100%;
+border-radius:12px;
+margin-top:8px;
+}
 
-    .file-attachment {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px;
-      background: rgba(0,0,0,0.2);
-      border-radius: 8px;
-    }
+.file{
+display:flex;
+align-items:center;
+gap:12px;
+padding:12px;
+background:rgba(255,255,255,.1);
+border-radius:12px;
+margin-top:8px;
+}
 
-    .file-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--accent);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #000;
-      font-weight: bold;
-    }
+.file a{
+color:white;
+text-decoration:none;
+font-weight:bold;
+}
 
-    /* Input Bar */
-    .input-bar {
-      padding: 16px 24px;
-      background: var(--panel-bg);
-      border-top: 1px solid var(--border-color);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+.input-area{
+padding:15px;
+background:#293742;
+display:flex;
+align-items:center;
+gap:10px;
+}
 
-    .input-bar input[type="text"] {
-      flex: 1;
-      background: var(--bg-dark);
-      border: 1px solid var(--border-color);
-      padding: 12px 16px;
-      border-radius: 20px;
-      color: var(--text-main);
-      outline: none;
-    }
+textarea{
+flex:1;
+resize:none;
+height:50px;
+padding:12px;
+border:none;
+border-radius:15px;
+outline:none;
+font-size:15px;
+}
 
-    .input-bar input[type="text"]:focus {
-      border-color: var(--accent);
-    }
+button{
+background:#4da6ff;
+color:white;
+border:none;
+padding:14px 22px;
+border-radius:14px;
+cursor:pointer;
+font-weight:bold;
+transition:.3s;
+}
 
-    .action-btn {
-      background: transparent;
-      border: none;
-      color: var(--text-muted);
-      cursor: pointer;
-      padding: 8px;
-      border-radius: 50%;
-      transition: color 0.2s, background 0.2s;
-    }
+button:hover{
+background:#2d8cff;
+}
 
-    .action-btn:hover {
-      color: var(--accent);
-      background: rgba(255,255,255,0.05);
-    }
+.attach{
+font-size:24px;
+cursor:pointer;
+color:white;
+}
 
-    .send-btn {
-      background: var(--accent);
-      color: #000;
-      font-weight: bold;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
+#file{
+display:none;
+}
 
-    .send-btn:hover {
-      background: var(--accent-hover);
-    }
+@keyframes pop{
+from{
+transform:scale(.9);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}
+}
 
-    input[type="file"] {
-      display: none;
-    }
-  </style>
+::-webkit-scrollbar{
+width:6px;
+}
+::-webkit-scrollbar-thumb{
+background:#4da6ff;
+border-radius:10px;
+}
+</style>
+
 </head>
 <body>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <div class="sidebar-header">
-      ⚡ TeleNative
-    </div>
-    <div class="chat-list">
-      <div class="chat-item active">
-        <div class="avatar">CC</div>
-        <div class="chat-info">
-          <div class="chat-name">Cloud Storage / Self</div>
-          <div class="chat-preview">Send uncompressed files & images...</div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="sidebar">
 
-  <!-- Chat Main Area -->
-  <div class="chat-area">
-    <div class="chat-header">
-      <div>
-        <div class="chat-name">Cloud Storage / Lossless Drop</div>
-        <div style="font-size: 0.8rem; color: var(--text-muted);">Original Quality Pipeline Active</div>
-      </div>
-    </div>
+<div class="logo">💬 Vertex Messenger</div>
 
-    <!-- Messages Container -->
-    <div class="messages-container" id="messageStream">
-      <div class="message incoming">
-        Welcome to TeleNative! Images dropped here bypass canvas compression to preserve full bit-rate and EXIF metadata.
-        <div class="message-meta">System • Just now</div>
-      </div>
-    </div>
+<div class="search">
+<input placeholder="Search chats">
+</div>
 
-    <!-- Controls Input -->
-    <div class="input-bar">
-      <!-- Uncompressed Image Trigger -->
-      <button class="action-btn" title="Send Original Image (Lossless)" onclick="document.getElementById('imageInput').click()">
-        🖼️
-      </button>
-      <input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">
+<div class="chat-list">
 
-      <!-- Large File Trigger -->
-      <button class="action-btn" title="Send Large Document/File" onclick="document.getElementById('fileInput').click()">
-        📎
-      </button>
-      <input type="file" id="fileInput" onchange="handleFileUpload(event)">
+<div class="chat">
+<div class="avatar">A</div>
+<div class="chat-info">
+<h4>Alex Johnson</h4>
+<p>Let's review the website...</p>
+</div>
+</div>
 
-      <input type="text" id="messageInput" placeholder="Write a message..." onkeypress="handleKeyPress(event)">
-      <button class="send-btn" onclick="sendTextMessage()">Send</button>
-    </div>
-  </div>
+<div class="chat">
+<div class="avatar" style="background:#ff7b54;">S</div>
+<div class="chat-info">
+<h4>Sarah Team</h4>
+<p>Files uploaded successfully</p>
+</div>
+</div>
 
-  <script>
-    const messageStream = document.getElementById('messageStream');
-    const messageInput = document.getElementById('messageInput');
+<div class="chat">
+<div class="avatar" style="background:#8b5cf6;">D</div>
+<div class="chat-info">
+<h4>Design Group</h4>
+<p>Pixel perfect completed</p>
+</div>
+</div>
 
-    function formatBytes(bytes, decimals = 2) {
-      if (bytes === 0) return '0 Bytes';
-      const k = 1024;
-      const dm = decimals < 0 ? 0 : decimals;
-      const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-      const i = Math.floor(Math.log(bytes) / Math.log(k));
-      return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
+</div>
 
-    function getCurrentTime() {
-      const now = new Date();
-      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
+</div>
 
-    function appendMessage(contentNode, isOutgoing = true) {
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${isOutgoing ? 'outgoing' : 'incoming'}`;
-      
-      msgDiv.appendChild(contentNode);
+<div class="main">
 
-      const metaDiv = document.createElement('div');
-      metaDiv.className = 'message-meta';
-      metaDiv.innerText = getCurrentTime();
-      msgDiv.appendChild(metaDiv);
+<div class="header">
+<div class="avatar">A</div>
+<div>
+<h3>Alex Johnson</h3>
+<p style="font-size:13px;color:#9fb3c8;">Online</p>
+</div>
+</div>
 
-      messageStream.appendChild(msgDiv);
-      messageStream.scrollTop = messageStream.scrollHeight;
-    }
+<div class="messages" id="messages">
 
-    function sendTextMessage() {
-      const text = messageInput.value.trim();
-      if (!text) return;
+<div class="msg received">
+Welcome to Vertex Messenger!
 
-      const span = document.createElement('span');
-      span.innerText = text;
+Send messages, images, or large files.
+Image quality stays original because the original file is shared.
+</div>
 
-      appendMessage(span, true);
-      messageInput.value = '';
-    }
+</div>
 
-    function handleKeyPress(e) {
-      if (e.key === 'Enter') {
-        sendTextMessage();
-      }
-    }
+<div class="input-area">
 
-    /**
-     * Lossless Image Handling:
-     * Reads directly from the raw File/Blob stream without using <canvas> 
-     * re-encoding, preserving exact original file bytes and resolution.
-     */
-    function handleImageUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+<label class="attach" for="file">📎</label>
+<input type="file" id="file">
 
-      const container = document.createElement('div');
+<textarea id="text" placeholder="Write a message..."></textarea>
 
-      const img = document.createElement('img');
-      const objectUrl = URL.createObjectURL(file);
-      img.src = objectUrl;
+<button onclick="send()">Send</button>
 
-      const mediaCard = document.createElement('div');
-      mediaCard.className = 'media-card';
-      mediaCard.appendChild(img);
+</div>
 
-      // Inspect resolution dynamically once loaded
-      img.onload = () => {
-        const badge = document.createElement('div');
-        badge.className = 'media-badge';
-        badge.innerText = `RAW • ${img.naturalWidth}x${img.naturalHeight}px • ${formatBytes(file.size)}`;
-        container.appendChild(mediaCard);
-        container.appendChild(badge);
-        appendMessage(container, true);
-      };
-      
-      e.target.value = ''; // Reset input
-    }
+</div>
 
-    /**
-     * File Transfer Handling:
-     * Prepares files for chunked byte streaming across network protocols.
-     */
-    function handleFileUpload(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+<script>
+const messages=document.getElementById("messages");
+const text=document.getElementById("text");
+const file=document.getElementById("file");
 
-      const fileCard = document.createElement('div');
-      fileCard.className = 'file-attachment';
+function createMessage(content,type="text",mine=true){
 
-      const ext = file.name.split('.').pop().toUpperCase();
-      
-      fileCard.innerHTML = `
-        <div class="file-icon">${ext.slice(0, 4)}</div>
-        <div>
-          <div style="font-weight: 600;">${file.name}</div>
-          <div style="font-size: 0.75rem; color: var(--text-muted);">${formatBytes(file.size)}</div>
-        </div>
-      `;
+const msg=document.createElement("div");
+msg.className="msg "+(mine?"sent":"received");
 
-      appendMessage(fileCard, true);
-      e.target.value = ''; // Reset input
-    }
-  </script>
+if(type==="text"){
+
+msg.textContent=content;
+
+}else if(type==="image"){
+
+const img=document.createElement("img");
+img.src=content.url;
+
+const cap=document.createElement("div");
+cap.textContent=content.name;
+
+msg.appendChild(cap);
+msg.appendChild(img);
+
+}else if(type==="file"){
+
+const box=document.createElement("div");
+box.className="file";
+
+box.innerHTML=`
+<div style="font-size:28px;">📁</div>
+<div>
+<a href="${content.url}" download="${content.name}">
+${content.name}
+</a>
+<div style="font-size:12px;">
+${content.size}
+</div>
+</div>
+`;
+
+msg.appendChild(box);
+
+}
+
+messages.appendChild(msg);
+messages.scrollTop=messages.scrollHeight;
+}
+
+function send(){
+
+const value=text.value.trim();
+
+if(value!==""){
+createMessage(value);
+text.value="";
+}
+
+if(file.files.length){
+
+const f=file.files[0];
+const url=URL.createObjectURL(f);
+
+if(f.type.startsWith("image")){
+
+createMessage({
+url:url,
+name:f.name
+},"image");
+
+}else{
+
+createMessage({
+url:url,
+name:f.name,
+size:(f.size/1024/1024).toFixed(2)+" MB"
+},"file");
+
+}
+
+file.value="";
+}
+
+}
+
+text.addEventListener("keydown",e=>{
+
+if(e.key==="Enter" && !e.shiftKey){
+
+e.preventDefault();
+send();
+
+}
+
+});
+</script>
+
 </body>
 </html>
