@@ -1,405 +1,465 @@
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vertex Messenger</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram-Style Web Messenger</title>
+    <style>
+        :root {
+            --bg-color: #0e1621;
+            --sidebar-bg: #17212b;
+            --chat-bg: #0e1621;
+            --bubble-sent: #2b5278;
+            --text-color: #f5f5f5;
+            --text-muted: #7f91a4;
+            --input-bg: #17212b;
+            --accent-color: #5288c1;
+            --hover-color: #202b36;
+        }
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Segoe UI,Arial,sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
 
-body{
-height:100vh;
-display:flex;
-background:#17212b;
-overflow:hidden;
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
 
-/* Sidebar */
+        /* Sidebar Layout */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid #101921;
+            display: flex;
+            flex-direction: column;
+        }
 
-.sidebar{
-width:320px;
-background:#202c33;
-display:flex;
-flex-direction:column;
-border-right:1px solid rgba(255,255,255,.08);
-}
+        .sidebar-header {
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-bottom: 1px solid #101921;
+            color: var(--accent-color);
+        }
 
-.logo{
-padding:20px;
-font-size:24px;
-font-weight:bold;
-color:white;
-background:#293742;
-}
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            background-color: var(--hover-color);
+        }
 
-.search{
-padding:15px;
-}
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
 
-.search input{
-width:100%;
-padding:12px;
-border:none;
-border-radius:10px;
-background:#36454f;
-color:white;
-outline:none;
-}
+        /* Main Chat Area */
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--chat-bg);
+        }
 
-.chat-list{
-flex:1;
-overflow:auto;
-}
+        .chat-header {
+            padding: 14px 20px;
+            background-color: var(--sidebar-bg);
+            border-bottom: 1px solid #101921;
+            display: flex;
+            align-items: center;
+        }
 
-.chat{
-display:flex;
-gap:12px;
-padding:15px;
-cursor:pointer;
-transition:.3s;
-}
+        .chat-header .status {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
-.chat:hover{
-background:#2d3b45;
-}
+        .messages-log {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
 
-.avatar{
-width:50px;
-height:50px;
-border-radius:50%;
-background:#4da6ff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:22px;
-color:white;
-}
+        /* Message Bubbles */
+        .message-row {
+            display: flex;
+            justify-content: flex-end;
+        }
 
-.chat-info h4{
-color:white;
-}
+        .message-bubble {
+            max-width: 65%;
+            background-color: var(--bubble-sent);
+            padding: 10px 14px;
+            border-radius: 12px 12px 0px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
 
-.chat-info p{
-color:#9fb3c8;
-font-size:14px;
-}
+        /* Message Formatting Preservation */
+        .message-text {
+            white-space: pre-wrap; /* Preserves tabs, spaces, and line breaks */
+            word-break: break-word;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
 
-/* Chat */
+        .message-media {
+            max-width: 100%;
+            border-radius: 8px;
+            margin-top: 4px;
+            /* Displays uncompressed image at native aspect ratio */
+            object-fit: contain; 
+        }
 
-.main{
-flex:1;
-display:flex;
-flex-direction:column;
-background:url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=80');
-background-size:cover;
-}
+        .file-attachment {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--text-color);
+        }
 
-.header{
-height:70px;
-background:#293742;
-display:flex;
-align-items:center;
-padding:20px;
-color:white;
-gap:15px;
-backdrop-filter:blur(8px);
-}
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
 
-.messages{
-flex:1;
-padding:20px;
-overflow:auto;
-display:flex;
-flex-direction:column;
-gap:12px;
-}
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
 
-.msg{
-max-width:70%;
-padding:12px 15px;
-border-radius:18px;
-white-space:pre-wrap;
-animation:pop .25s ease;
-word-wrap:break-word;
-}
+        .file-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
 
-.sent{
-align-self:flex-end;
-background:#4da6ff;
-color:white;
-border-bottom-right-radius:6px;
-}
+        .file-size {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
 
-.received{
-align-self:flex-start;
-background:#2d3b45;
-color:white;
-border-bottom-left-radius:6px;
-}
+        .message-timestamp {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.6);
+            align-self: flex-end;
+            margin-top: 2px;
+        }
 
-.msg img{
-width:100%;
-border-radius:12px;
-margin-top:8px;
-}
+        /* Input Bar */
+        .input-bar {
+            padding: 12px 20px;
+            background-color: var(--sidebar-bg);
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            border-top: 1px solid #101921;
+        }
 
-.file{
-display:flex;
-align-items:center;
-gap:12px;
-padding:12px;
-background:rgba(255,255,255,.1);
-border-radius:12px;
-margin-top:8px;
-}
+        .attach-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
 
-.file a{
-color:white;
-text-decoration:none;
-font-weight:bold;
-}
+        .attach-btn:hover {
+            color: var(--text-color);
+        }
 
-.input-area{
-padding:15px;
-background:#293742;
-display:flex;
-align-items:center;
-gap:10px;
-}
+        .message-input {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 10px 16px;
+            color: var(--text-color);
+            font-size: 0.95rem;
+            outline: none;
+            resize: none;
+            max-height: 120px;
+            min-height: 40px;
+            line-height: 1.4;
+        }
 
-textarea{
-flex:1;
-resize:none;
-height:50px;
-padding:12px;
-border:none;
-border-radius:15px;
-outline:none;
-font-size:15px;
-}
+        .message-input:focus {
+            border-color: var(--accent-color);
+        }
 
-button{
-background:#4da6ff;
-color:white;
-border:none;
-padding:14px 22px;
-border-radius:14px;
-cursor:pointer;
-font-weight:bold;
-transition:.3s;
-}
+        .send-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
 
-button:hover{
-background:#2d8cff;
-}
+        .send-btn:hover {
+            background-color: #4272a3;
+        }
 
-.attach{
-font-size:24px;
-cursor:pointer;
-color:white;
-}
+        /* Preview overlay for attachments */
+        .attachment-preview {
+            display: none;
+            padding: 8px 12px;
+            background: var(--hover-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-#file{
-display:none;
-}
+        .attachment-preview.active {
+            display: flex;
+        }
 
-@keyframes pop{
-from{
-transform:scale(.9);
-opacity:0;
-}
-to{
-transform:scale(1);
-opacity:1;
-}
-}
+        .remove-attachment {
+            cursor: pointer;
+            color: #ff5c5c;
+            font-weight: bold;
+            margin-left: 10px;
+        }
 
-::-webkit-scrollbar{
-width:6px;
-}
-::-webkit-scrollbar-thumb{
-background:#4da6ff;
-border-radius:10px;
-}
-</style>
-
+        #fileInput {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
-<div class="sidebar">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">Telegram Messenger</div>
+        <div class="chat-list-item">
+            <div class="avatar">TG</div>
+            <div>
+                <div style="font-weight: 600;">Saved Messages</div>
+                <div style="font-size: 0.8rem; color: var(--text-muted);">Cloud Storage</div>
+            </div>
+        </div>
+    </div>
 
-<div class="logo">💬 Vertex Messenger</div>
+    <!-- Chat View Container -->
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar" style="width:36px; height:36px; font-size:0.8rem;">TG</div>
+            <div>
+                <div style="font-weight: 600; font-size: 0.95rem;">Saved Messages</div>
+                <div class="status">online</div>
+            </div>
+        </div>
 
-<div class="search">
-<input placeholder="Search chats">
-</div>
+        <!-- Chat Log -->
+        <div class="messages-log" id="messagesLog"></div>
 
-<div class="chat-list">
+        <!-- Input Bar Area -->
+        <div style="padding: 0 20px 12px 20px; background-color: var(--sidebar-bg);">
+            <div class="attachment-preview" id="attachmentPreview">
+                <span id="attachmentName">file.txt</span>
+                <span class="remove-attachment" onclick="clearAttachment()">&#10005;</span>
+            </div>
+            
+            <div class="input-bar" style="padding: 0; border: none;">
+                <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Attach File or Image">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
+                    </svg>
+                </button>
+                <input type="file" id="fileInput" onchange="handleFileSelect(event)">
+                
+                <textarea 
+                    id="messageInput" 
+                    class="message-input" 
+                    placeholder="Write a message..." 
+                    rows="1" 
+                    onkeydown="handleKeyDown(event)"></textarea>
 
-<div class="chat">
-<div class="avatar">A</div>
-<div class="chat-info">
-<h4>Alex Johnson</h4>
-<p>Let's review the website...</p>
-</div>
-</div>
+                <button class="send-btn" onclick="sendMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div class="chat">
-<div class="avatar" style="background:#ff7b54;">S</div>
-<div class="chat-info">
-<h4>Sarah Team</h4>
-<p>Files uploaded successfully</p>
-</div>
-</div>
+    <script>
+        let selectedFile = null;
 
-<div class="chat">
-<div class="avatar" style="background:#8b5cf6;">D</div>
-<div class="chat-info">
-<h4>Design Group</h4>
-<p>Pixel perfect completed</p>
-</div>
-</div>
+        // Auto-resize input height based on content
+        const messageInput = document.getElementById('messageInput');
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 120 ? this.scrollHeight : 120) + 'px';
+        });
 
-</div>
+        function handleKeyDown(event) {
+            // Send on Enter (Shift+Enter for new line)
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
 
-</div>
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
 
-<div class="main">
+            selectedFile = file;
+            const previewBar = document.getElementById('attachmentPreview');
+            const previewName = document.getElementById('attachmentName');
+            
+            previewName.textContent = `Attached: ${file.name} (${formatBytes(file.size)})`;
+            previewBar.classList.add('active');
+        }
 
-<div class="header">
-<div class="avatar">A</div>
-<div>
-<h3>Alex Johnson</h3>
-<p style="font-size:13px;color:#9fb3c8;">Online</p>
-</div>
-</div>
+        function clearAttachment() {
+            selectedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('attachmentPreview').classList.remove('active');
+        }
 
-<div class="messages" id="messages">
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
 
-<div class="msg received">
-Welcome to Vertex Messenger!
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
 
-Send messages, images, or large files.
-Image quality stays original because the original file is shared.
-</div>
+        function getCurrentTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
 
-</div>
+        function sendMessage() {
+            const text = messageInput.value;
+            
+            // Prevent sending if both input and attachment are empty
+            if (!text.trim() && !selectedFile) return;
 
-<div class="input-area">
+            const log = document.getElementById('messagesLog');
+            
+            const messageRow = document.createElement('div');
+            messageRow.className = 'message-row';
 
-<label class="attach" for="file">📎</label>
-<input type="file" id="file">
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
 
-<textarea id="text" placeholder="Write a message..."></textarea>
+            // 1. Handle File/Image attachments without compression
+            if (selectedFile) {
+                // Generate a local Blob URL pointing directly to raw file data
+                const fileUrl = URL.createObjectURL(selectedFile);
 
-<button onclick="send()">Send</button>
+                if (selectedFile.type.startsWith('image/')) {
+                    // Display uncompressed raw image file
+                    const img = document.createElement('img');
+                    img.src = fileUrl;
+                    img.className = 'message-media';
+                    img.alt = selectedFile.name;
+                    bubble.appendChild(img);
+                } else {
+                    // Display downloadable large file card
+                    const fileCard = document.createElement('a');
+                    fileCard.href = fileUrl;
+                    fileCard.download = selectedFile.name;
+                    fileCard.className = 'file-attachment';
+                    
+                    const ext = selectedFile.name.split('.').pop() || 'file';
+                    
+                    fileCard.innerHTML = `
+                        <div class="file-icon">${ext.substring(0, 4)}</div>
+                        <div class="file-info">
+                            <span class="file-name">${escapeHTML(selectedFile.name)}</span>
+                            <span class="file-size">${formatBytes(selectedFile.size)}</span>
+                        </div>
+                    `;
+                    bubble.appendChild(fileCard);
+                }
+            }
 
-</div>
+            // 2. Preserved Text Formatting
+            if (text.trim()) {
+                const textContainer = document.createElement('div');
+                textContainer.className = 'message-text';
+                // HTML-escaped to prevent XSS, rendered with preserved whitespace
+                textContainer.innerHTML = escapeHTML(text);
+                bubble.appendChild(textContainer);
+            }
 
-</div>
+            // 3. Timestamp
+            const timestamp = document.createElement('span');
+            timestamp.className = 'message-timestamp';
+            timestamp.textContent = getCurrentTime();
+            bubble.appendChild(timestamp);
 
-<script>
-const messages=document.getElementById("messages");
-const text=document.getElementById("text");
-const file=document.getElementById("file");
+            messageRow.appendChild(bubble);
+            log.appendChild(messageRow);
 
-function createMessage(content,type="text",mine=true){
+            // Auto scroll to bottom immediately
+            log.scrollTop = log.scrollHeight;
 
-const msg=document.createElement("div");
-msg.className="msg "+(mine?"sent":"received");
-
-if(type==="text"){
-
-msg.textContent=content;
-
-}else if(type==="image"){
-
-const img=document.createElement("img");
-img.src=content.url;
-
-const cap=document.createElement("div");
-cap.textContent=content.name;
-
-msg.appendChild(cap);
-msg.appendChild(img);
-
-}else if(type==="file"){
-
-const box=document.createElement("div");
-box.className="file";
-
-box.innerHTML=`
-<div style="font-size:28px;">📁</div>
-<div>
-<a href="${content.url}" download="${content.name}">
-${content.name}
-</a>
-<div style="font-size:12px;">
-${content.size}
-</div>
-</div>
-`;
-
-msg.appendChild(box);
-
-}
-
-messages.appendChild(msg);
-messages.scrollTop=messages.scrollHeight;
-}
-
-function send(){
-
-const value=text.value.trim();
-
-if(value!==""){
-createMessage(value);
-text.value="";
-}
-
-if(file.files.length){
-
-const f=file.files[0];
-const url=URL.createObjectURL(f);
-
-if(f.type.startsWith("image")){
-
-createMessage({
-url:url,
-name:f.name
-},"image");
-
-}else{
-
-createMessage({
-url:url,
-name:f.name,
-size:(f.size/1024/1024).toFixed(2)+" MB"
-},"file");
-
-}
-
-file.value="";
-}
-
-}
-
-text.addEventListener("keydown",e=>{
-
-if(e.key==="Enter" && !e.shiftKey){
-
-e.preventDefault();
-send();
-
-}
-
-});
-</script>
-
+            // Reset input controls
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            clearAttachment();
+        }
+    </script>
 </body>
 </html>
